@@ -42,9 +42,12 @@ int main() {
 
 	string str;
 	while (cin >> str) {
-		for (int i = 0; i < str.size(); i ++)
+		for (int i = 0; i < str.size(); i ++) {
 			if ('a' <= str[i] && str[i] <= 'z')
 				cout << sub[(int)(str[i] - 'a')];
+			else
+				cout << str[i];
+		}
 		cout << ' ';
 	}
 }
