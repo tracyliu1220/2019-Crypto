@@ -244,7 +244,6 @@ unsigned long long DES(unsigned long long text, unsigned long long key, bool sta
         int r = round + 1;
         if (state) r = 16 - round - 1;
         text = Round(text, key);
-        cout << text << '\n';
         key = Key_scheduling(key, r, state);
     }
 
@@ -258,12 +257,30 @@ unsigned long long DES(unsigned long long text, unsigned long long key, bool sta
 }
 
 int main() {
+    
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
+
     bool state = false; // 0: enc, 1: dec
     unsigned long long key  =   0x5B5A57676A56676E;
     unsigned long long text =   0x675A69675E5A6B5A;
     unsigned long long cipher = 0x974AFFBF86022D1F;
+    int ignore;
 
-    cout << hex << DES(text, key, state) << '\n';
-    cout << "-------------------\n";
-    cout << hex << DES(cipher, key, true) << '\n';
+    int T = 10;
+    while (T --) {
+        scanf("%llx %llx", &key, &text);
+        printf("%llX\n", DES(text, key, state));
+    }
+
+    T = 10; state = true;
+    while (T --) {
+        scanf("%llx %llx", &key, &text);
+        printf("%llX\n", DES(text, key, state));
+    }
+
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    cout << "Running time: " << cpu_time_used << '\n';
 }
