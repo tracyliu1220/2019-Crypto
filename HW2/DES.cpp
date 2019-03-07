@@ -1,21 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// IP, Inverse IP, E table 1, E table 2, P, PC1, PC2
-const int Permu_actual[7] = {64, 64, 32, 32, 32, 64, 56};
-const int Permu_total[7] = {64, 64, 48, 48, 32, 56, 48};
+// IP, Inverse IP, E table, P, PC1, PC2
+const int Permu_in[7] =  {64, 64, 32, 32, 64, 56};
+const int Permu_out[7] = {64, 64, 48, 32, 56, 48};
 
 const int Permu[7][64] = {
    // IP 
-    {39, 7, 47, 15, 55, 23, 63, 31,
-     38, 6, 46, 14, 54, 22, 62, 30,
-     37, 5, 45, 13, 53, 21, 61, 29,
-     36, 4, 44, 12, 52, 20, 60, 28,
-     35, 3, 43, 11, 51, 19, 59, 27,
-     34, 2, 42, 10, 50, 18, 58, 26,
-     33, 1, 41,  9, 49, 17, 57, 25,
-     32, 0, 40,  8, 48, 16, 56, 24},
-   // Inverse IP
     {57, 49, 41, 33, 25, 17,  9, 1,
      59, 51, 43, 35, 27, 19, 11, 3,
      61, 53, 45, 37, 29, 21, 13, 5,
@@ -24,46 +15,45 @@ const int Permu[7][64] = {
      58, 50, 42, 34, 26, 18, 10, 2,
      60, 52, 44, 36, 28, 20, 12, 4,
      62, 54, 46, 38, 30, 22, 14, 6},
-    // E table 1
-    { 1,  2,  3,  4,
-      7,  8,  9, 10,
-     13, 14, 15, 16,
-     19, 20, 21, 22,
-     25, 26, 27, 28,
-     31, 32, 33, 34,
-     37, 38, 39, 40,
-     43, 44, 45, 46},
-    // E table 2
-    {47, -1, -1,  6,
-      5, -1, -1, 12,
-     11, -1, -1, 18,
-     17, -1, -1, 24,
-     23, -1, -1, 30,
-     29, -1, -1, 36,
-     35, -1, -1, 42,
-     41, -1, -1,  0},
+   // Inverse IP
+    {39, 7, 47, 15, 55, 23, 63, 31,
+     38, 6, 46, 14, 54, 22, 62, 30,
+     37, 5, 45, 13, 53, 21, 61, 29,
+     36, 4, 44, 12, 52, 20, 60, 28,
+     35, 3, 43, 11, 51, 19, 59, 27,
+     34, 2, 42, 10, 50, 18, 58, 26,
+     33, 1, 41,  9, 49, 17, 57, 25,
+     32, 0, 40,  8, 48, 16, 56, 24},
+    // E table
+    {31,  0,  1,  2,  3,  4,
+      3,  4,  5,  6,  7,  8,
+      7,  8,  9, 10, 11, 12,
+     11, 12, 13, 14, 15, 16,
+     15, 16, 17, 18, 19, 20,
+     19, 20, 21, 22, 23, 24,
+     23, 24, 25, 26, 27, 28,
+     27, 28, 29, 30, 31,  0},
     // P
-    { 8, 16, 22, 30, 12, 27,  1, 17,
-     23, 15, 29,  5, 25, 19,  9,  0,
-      7, 13, 24,  2,  3, 28, 10, 18,
-     31, 11, 21,  6,  4, 26, 14, 20},
+    {15,  6, 19, 20, 28, 11, 27, 16,
+      0, 14, 22, 25,  4, 17, 30,  9,
+      1,  7, 23, 13, 31, 26,  2,  8,
+     18, 12, 29,  5, 21, 10,  3, 24},
     // PC1
-    { 7, 15, 23, 55, 51, 43, 35, -1, 
-      6, 14, 22, 54, 50, 42, 34, -1, 
-      5, 13, 21, 53, 49, 41, 33, -1, 
-      4, 12, 20, 52, 48, 40, 32, -1, 
-      3, 11, 19, 27, 47, 39, 31, -1, 
-      2, 10, 18, 26, 46, 38, 30, -1, 
-      1,  9, 17, 25, 45, 37, 29, -1, 
-      0,  8, 16, 24, 44, 36, 28, -1},
+     {56, 48, 40, 32, 24, 16,  8,
+       0, 57, 49, 41, 33, 25, 17,
+       9,  1, 58, 50, 42, 34, 26,
+      18, 10,  2, 59, 51, 43, 35,
+      62, 54, 46, 38, 30, 22, 14,
+       6, 61, 53, 45, 37, 29, 21,
+      13,  5, 60, 52, 44, 36, 28,
+      20, 12,  4, 27, 19, 11,  3},
     // PC2
-     { 4, 23,  6, 15,  5,  9, 19, 17, 
-      -1, 11,  2, 14, 22,  0,  8, 18, 
-       1, -1, 13, 21, 10, -1, 12,  3, 
-      -1, 16, 20,  7, 46, 30, 26, 47, 
-      34, 40, -1, 45, 27, -1, 38, 31, 
-      24, 43, -1, 36, 33, 42, 28, 35, 
-      37, 44, 32, 25, 41, -1, 29, 39}
+     {13, 16, 10, 23,  0,  4,  2, 27,
+      14,  5, 20,  9, 22, 18, 11,  3,
+      25,  7, 15,  6, 26, 19, 12,  1,
+      40, 51, 30, 36, 46, 54, 29, 39,
+      50, 44, 32, 47, 43, 48, 38, 55,
+      33, 52, 45, 41, 49, 35, 28, 31}
     };
 
 const int Box[8][4][16] = {
@@ -140,37 +130,19 @@ const unsigned long long Box_block[8] = {277076930199552,
     4032, 
     63};
 
-const int key_rotate[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
-
-void Print64(unsigned long long text) {
-    cout << bitset<64>(text) << '\n';
-}
-
-void Print56(unsigned long long text) {
-    cout << bitset<56>(text) << '\n';
-}
+const int key_rotate[20] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
 
 void Print48(unsigned long long text) {
     cout << bitset<48>(text) << '\n';
 }
 
-void Print32(unsigned long long text) {
-    cout << bitset<32>(text) << '\n';
-}
-
-void Print28(unsigned long long text) {
-    cout << bitset<28>(text) << '\n';
-}
-
 unsigned long long Permutation(unsigned long long text, int table, unsigned long long target = 0) {
-    int idx;
-    for (int i = 0; i < Permu_actual[table]; i ++) {
-        idx = Permu_actual[table] - i - 1;
-        if (Permu[table][idx] == -1) continue;
-        // if (text & (1ULL << idx)) cout << idx << ' ' << Permu[table][idx] << '\n';
-        if (text & (1ULL << idx))
-            target |= (1ULL << (Permu_total[table] - Permu[table][idx] - 1));
-            // target |= (1ULL << Permu[table][idx]);
+    int idx1, idx2;
+    for (int i = 0; i < Permu_out[table]; i ++) {
+        idx1 = Permu_out[table] - i - 1;
+        idx2 = Permu_in[table] - Permu[table][i] - 1;
+        if (text & (1ULL << idx2))
+            target |= (1ULL << idx1);
     }
     return target;
 }
@@ -178,7 +150,6 @@ unsigned long long Permutation(unsigned long long text, int table, unsigned long
 unsigned long long E(unsigned long long text) {
     // E table
     unsigned long long target = Permutation(text, 2);
-    target = Permutation(text, 3, target);
     return target;
 }
 
@@ -191,7 +162,6 @@ unsigned long long S_box(unsigned long long text) {
         a |= target[i] & 1;
         b = (target[i] >> 1) & 15;
         target[i] = Box[i][a][b];
-        // cout << a << ' ' << b << ' ' << target[i] << '\n';
     }
     unsigned long long ret = 0;
     for (int i = 0; i < 8; i ++) {
@@ -202,7 +172,7 @@ unsigned long long S_box(unsigned long long text) {
 }
 
 unsigned long long P(unsigned long long text) {
-    return Permutation(text, 4);
+    return Permutation(text, 3);
 }
 
 unsigned long long Key_shift(unsigned long long text, int s, bool state) { // s = shift time
@@ -235,17 +205,7 @@ unsigned long long Round(unsigned long long text, unsigned long long key) {
     R = E(R);
     
     // R XOR with PC2 Key
-    key = Permutation(key, 6);
-    /*
-    unsigned long long K = 0;
-    for (int i = 0; i < 8; i ++) {
-        unsigned long long tmp = (key & Box_block[i]) >> 6 * (8 - i - 1);
-        K |= tmp;
-        if (i != 7) K = (K << 8);
-    }
-    cout << "Key: " << hex << K;
-    cout << ' ';
-    */
+    key = Permutation(key, 5);
     R ^= key;
     
     // S-box
@@ -261,28 +221,35 @@ unsigned long long Round(unsigned long long text, unsigned long long key) {
     return (nextL << 32) | R;
 }
 
-unsigned long long DES(unsigned long long text, unsigned long long key, bool state) {
-    // IP
-    text = Permutation(text, 0);
-    // cout << "IP: " << hex << text << '\n';
-    
-    // PC1
-    key = Permutation(key, 5);
-    Print56(key);
-    
-    // 16 Rounds and Key scheduling
-    for (int round = 0; round < 16; round ++) {
-        key = Key_scheduling(key, round, state);
-        Print56(key);
-        text = Round(text, key);
-        // cout << hex << text;
-        // cout << '\n';
-    }
-
+unsigned long long Swap(unsigned long long text) {
     // 32-bit Swap
     unsigned long long L = (text & ((1ULL << 32) - 1) << 32) >> 32;
     unsigned long long R = text & ((1ULL << 32) - 1);
     text = (R << 32) | L;
+    return text;
+}
+
+unsigned long long DES(unsigned long long text, unsigned long long key, bool state) {
+
+    // IP
+    text = Permutation(text, 0);
+    
+    // PC1
+    key = Permutation(key, 4);
+    
+    // 16 Rounds and Key scheduling
+    if (!state)
+        key = Key_scheduling(key, 0, state);
+    for (int round = 0; round < 16; round ++) {
+        int r = round + 1;
+        if (state) r = 16 - round - 1;
+        text = Round(text, key);
+        cout << text << '\n';
+        key = Key_scheduling(key, r, state);
+    }
+
+    // 32-bit Swap
+    text = Swap(text);
     
     // Inverse IP
     text = Permutation(text, 1);
@@ -291,14 +258,12 @@ unsigned long long DES(unsigned long long text, unsigned long long key, bool sta
 }
 
 int main() {
-
     bool state = false; // 0: enc, 1: dec
-    // 0x5B5A57676A56676E 0x675A69675E5A6B5A
-    // unsigned long long key  = 0x0f1571c947d9e859;
-    // unsigned long long text = 0x02468aceeca86420;
-    
-    unsigned long long key  = 0x5B5A57676A56676E;
-    unsigned long long text = 0x675A69675E5A6B5A;
+    unsigned long long key  =   0x5B5A57676A56676E;
+    unsigned long long text =   0x675A69675E5A6B5A;
+    unsigned long long cipher = 0x974AFFBF86022D1F;
 
     cout << hex << DES(text, key, state) << '\n';
+    cout << "-------------------\n";
+    cout << hex << DES(cipher, key, true) << '\n';
 }
