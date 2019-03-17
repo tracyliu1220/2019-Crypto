@@ -270,13 +270,13 @@ int main() {
     int T = 10;
     while (T --) {
         scanf("%llx %llx", &key, &text);
-        printf("%llX\n", DES(text, key, state));
+        printf("%016llX\n", DES(text, key, state));
     }
 
     T = 10; state = true;
     while (T --) {
         scanf("%llx %llx", &key, &text);
-        printf("%llX\n", DES(text, key, state));
+        printf("%016llX\n", DES(text, key, state));
     }
 
     end = clock();
