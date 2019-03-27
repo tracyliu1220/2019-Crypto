@@ -1,0 +1,3 @@
+#!/bin/bash
+
+g++ -DNDEBUG -g2 -O2 $1 ./cryptopp/libcryptopp.a
