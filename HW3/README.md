@@ -14,6 +14,11 @@ cd cryptopp
 make
 ```
 
+## Include
+```
+#include "cryptopp/modes.h"
+```
+
 ## Compiling
 
 ```
@@ -24,5 +29,5 @@ g++ -DNDEBUG -g2 -O2 $CPPFILE ./cryptopp/libcryptopp.a
 
 - [AES](https://www.cryptopp.com/wiki/Advanced_Encryption_Standard)
 - [ECB Mode](https://www.cryptopp.com/wiki/ECB_Mode)
-
+- [ArraySource](https://www.cryptopp.com/wiki/ArraySource)
 
