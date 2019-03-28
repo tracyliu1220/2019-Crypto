@@ -3,94 +3,138 @@
 #include "cryptopp/modes.h"
 #include "cryptopp/hex.h"
 #include "cryptopp/filters.h"
-#include "cryptopp/files.h"
 
-void Padding(std::string input, 
-             std::vector<CryptoPP::byte> & plain, 
-             int length, bool state) { // 0: zeros, 1: PKCS#7
-    
-    if ((input.size() + 1) % length == 0) {
-        plain.resize(input.size() + 1);
-        for (int i = 0; i < input.size(); i ++)
-            plain[i] = input[i];
-        plain[input.size()] = (char)0;
-        return;
-    }
-
-    int n = ((input.size() + 1) / length + 1) * length;
-    
-    char add;
-    if (state) add = (char)(n - (input.size() + 1));
-    else add = (char)0;
-    
-    plain.resize(n);
-    for (int i = 0; i < input.size(); i ++)
-        plain[i] = input[i];
-    plain[input.size()] = (char)0;
-    for (int i = input.size() + 1; i < n; i ++)
-        plain[i] = add;
-} 
-
-// ECB Mode
-void Encrypt(std::vector<CryptoPP::byte> & plain, 
-             std::vector<CryptoPP::byte> & cipher, 
-             CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption E) {
-    
-    cipher.resize(plain.size());
-    CryptoPP::ArraySink cs(&cipher[0], cipher.size());
-    
-    CryptoPP::ArraySource(plain.data(), plain.size(), true,
+// enc/ECB
+std::string Encrypt(std::string input, 
+                    CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption E,
+                    CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
+    std::string result;
+    CryptoPP::StringSource(input, true,
         new CryptoPP::StreamTransformationFilter(E,
-            new CryptoPP::Redirector(cs)
+            new CryptoPP::StringSink(result),
+            paddingMethod
         )
     );
+    return result;
 }
 
-// CBC Mode
-void Encrypt(std::vector<CryptoPP::byte> & plain, 
-             std::vector<CryptoPP::byte> & cipher, 
-             CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption E) {
-    
-    cipher.resize(plain.size());
-    CryptoPP::ArraySink cs(&cipher[0], cipher.size());
-    
-    CryptoPP::ArraySource(plain.data(), plain.size(), true,
+// enc/CBC
+std::string Encrypt(std::string input, 
+                    CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption E,
+                    CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
+    std::string result;
+    CryptoPP::StringSource(input, true,
         new CryptoPP::StreamTransformationFilter(E,
-            new CryptoPP::Redirector(cs)
+            new CryptoPP::StringSink(result),
+            paddingMethod
         )
     );
+    return result;
+}
+
+// dec/ECB
+std::string Decrypt(std::string input, 
+                    CryptoPP::ECB_Mode<CryptoPP::AES>::Decryption D,
+                    CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
+    std::string result;
+    CryptoPP::StringSource(input, true,
+        new CryptoPP::StreamTransformationFilter(D,
+            new CryptoPP::StringSink(result),
+            paddingMethod
+        )
+    );
+    return result;
+}
+
+// dec/CBC
+std::string Decrypt(std::string input, 
+                    CryptoPP::CBC_Mode<CryptoPP::AES>::Decryption D,
+                    CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
+    std::string result;
+    CryptoPP::StringSource(input, true,
+        new CryptoPP::StreamTransformationFilter(D,
+            new CryptoPP::StringSink(result),
+            paddingMethod
+        )
+    );
+    return result;
 }
 
 int main() {
 
-    // parameters
-    bool padding_state = true;  // 0: zeros, 1: PKCS#7
-    int  key_length = 16;
-    std::string input = "AES is efficient in both software and hardware.";
-    std::string mode  = "CBC";
-
-    std::vector<CryptoPP::byte> plain, cipher;
-    CryptoPP::HexEncoder encoder(new CryptoPP::FileSink(std::cout));
-
-    Padding(input, plain, CryptoPP::AES::BLOCKSIZE, padding_state);
+    // Parameters
+    std::string state   = "dec"; // enc, dec
+    std::string mode    = "ECB"; // ECB, CBC
+    std::string padding = "zeros"; // zeros, pkcs
+    // std::string input   = "Hello World!";
+    // std::string input   = "2E9868AA6EAE72184B4A8881F3DFB26B";
+    std::string input   = "3AB2D9A5B00C722C5799A1C6BF5287B80468BF5F55A1A6C7576CB7E62CC924234369CA8F412F1345C87C4D7C1339C684";
+    std::string _key    = "1234567890123456";
+    std::string _iv     = "0000000000000000";
     
+    // Other Variables
+    std::string result, encoded;
+    int key_length = CryptoPP::AES::BLOCKSIZE;
     CryptoPP::byte key[key_length] = {'1', '2', '3', '4', '5', '6', '7', '8', 
                                       '9', '0', '1', '2', '3', '4', '5', '6'};
-    CryptoPP::byte iv[key_length]  = {'0', '0', '0', '0', '0', '0', '0', '0', 
-                                      '0', '0', '0', '0', '0', '0', '0', '0'};
+    CryptoPP::byte iv[CryptoPP::AES::BLOCKSIZE]  = {'0', '0', '0', '0', '0', '0', '0', '0', 
+                                                    '0', '0', '0', '0', '0', '0', '0', '0'};
 
-    // EBC
-    CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption ECB;
-    ECB.SetKey(key, key_length);
+    // Set Input Type
+    if (state == "dec") {
+        CryptoPP::HexDecoder decoder;
+        decoder.Put((CryptoPP::byte*)input.data(), input.size());
+        std::string decoded;
+        decoded.resize(decoder.MaxRetrievable());
+        decoder.Get((CryptoPP::byte*)&decoded[0], decoded.size());
+        input = decoded;
+    }
 
-    // CBC
-    CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption CBC;
-    CBC.SetKeyWithIV(key, key_length, iv);
+    // Set Key and IV
+    for (int i = 0; i < key_length; i ++) key[i] = _key[i];
+    for (int i = 0; i < CryptoPP::AES::BLOCKSIZE; i ++) iv[i] = _iv[i];    
+
+    // Set Padding
+    CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod;
+    if (padding == "zeros") 
+        paddingMethod = CryptoPP::BlockPaddingSchemeDef::ZEROS_PADDING;
+    if (padding == "pkcs")  
+        paddingMethod = CryptoPP::BlockPaddingSchemeDef::PKCS_PADDING;
     
-    if (mode == "ECB") Encrypt(plain, cipher, ECB);
-    if (mode == "CBC") Encrypt(plain, cipher, CBC);
+    // Set Mode and Encrypt
+    if (state == "enc" && mode == "ECB") {
+        CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption ECB;
+        ECB.SetKey(key, key_length);
+        result = Encrypt(input, ECB, paddingMethod);
+    }
+    if (state == "enc" && mode == "CBC") {
+        CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption CBC;
+        CBC.SetKeyWithIV(key, key_length, iv);
+        result = Encrypt(input, CBC, paddingMethod);
+    }
 
-    encoder.Put(cipher.data(), cipher.size());
-    encoder.MessageEnd();
-    std::cout << std::endl;
+    // Set Mode and Decrypt
+    if (state == "dec" && mode == "ECB") {
+        CryptoPP::ECB_Mode<CryptoPP::AES>::Decryption ECB;
+        ECB.SetKey(key, key_length);
+        result = Decrypt(input, ECB, paddingMethod);
+    }
+    if (state == "dec" && mode == "CBC") {
+        CryptoPP::CBC_Mode<CryptoPP::AES>::Decryption CBC;
+        CBC.SetKeyWithIV(key, key_length, iv);
+        result = Decrypt(input, CBC, paddingMethod);
+    }
+
+    // Output
+    if (state == "dec")
+        std::cout << result << std::endl;
+    if (state == "enc") {
+        encoded.clear();
+        CryptoPP::StringSource(result, true,
+            new CryptoPP::HexEncoder(
+                new CryptoPP::StringSink(encoded)
+            )
+        );
+        std::cout << encoded << std::endl;
+    }
 }
