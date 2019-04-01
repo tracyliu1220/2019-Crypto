@@ -61,6 +61,7 @@ void Decrypt(std::vector<CryptoPP::byte> & input,
             paddingMethod
         )
     );
+	result.resize(cs.TotalPutLength());
 }
 
 // dec/CBC
@@ -78,11 +79,13 @@ void Decrypt(std::vector<CryptoPP::byte> & input,
             paddingMethod
         )
     );
+	result.resize(cs.TotalPutLength());
 }
 
 void Print(std::vector<CryptoPP::byte> & result) {
     for (int i = 0; i < result.size(); i ++)
-        if ((int)result[i] > 16) std::cout << result[i];
+        // if ((int)result[i] > 16) 
+            std::cout << result[i];
     std::cout << std::endl;
 }
 
