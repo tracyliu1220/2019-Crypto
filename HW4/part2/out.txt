@@ -1,0 +1,3 @@
+212e30804c5f86ab61967f2e78aee1cfh
+aba9b57f765d9ef6c6793ee173c4b2f3413e5d69e3ec1fa3f095279db3d70bd4h
+Cryptography is useful.

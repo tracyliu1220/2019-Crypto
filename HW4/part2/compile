@@ -1,0 +1,4 @@
+#!/bin/bash
+
+g++ -o rsa.out -DNDEBUG -g2 -O2 $1 ./cryptopp/libcryptopp.a
+./rsa.out
