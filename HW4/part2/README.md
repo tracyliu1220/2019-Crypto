@@ -66,11 +66,11 @@ ss >> str;
 ### output: from hex to ascii
 ```cpp
 for (int i = 0; i < str.size() - 1; i += 2) {
-        int tmp = 0;
-        tmp += c_to_i(str[i]) * 16;
-        tmp += c_to_i(str[i + 1]);
-        result = result + (char)tmp;
-    }
+    int tmp = 0;
+    tmp += c_to_i(str[i]) * 16;
+    tmp += c_to_i(str[i + 1]);
+    result = result + (char)tmp;
+}
 ```
 
 ### output
