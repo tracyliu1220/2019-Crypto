@@ -1,0 +1,4 @@
+#!/bin/bash
+
+g++ -o a.out -DNDEBUG -g2 -O2 $1 ./cryptopp/libcryptopp.a
+./a.out
