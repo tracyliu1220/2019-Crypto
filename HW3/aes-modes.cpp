@@ -5,18 +5,18 @@
 #include "cryptopp/filters.h"
 
 // enc/ECB
-void Encrypt(std::vector<CryptoPP::byte> & input, 
-             std::vector<CryptoPP::byte> & result, 
+void Encrypt(std::vector<CryptoPP::byte> & input,
+             std::vector<CryptoPP::byte> & result,
              CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption E,
              CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
-    
+
     int n = input.size() / CryptoPP::AES::BLOCKSIZE;
     if (input.size() % CryptoPP::AES::BLOCKSIZE) n ++;
     n *= CryptoPP::AES::BLOCKSIZE;
 
     result.resize(n);
     CryptoPP::ArraySink cs(&result[0], result.size());
-    
+
     CryptoPP::ArraySource(input.data(), input.size(), true,
         new CryptoPP::StreamTransformationFilter(E,
             new CryptoPP::Redirector(cs),
@@ -26,18 +26,18 @@ void Encrypt(std::vector<CryptoPP::byte> & input,
 }
 
 // enc/CBC
-void Encrypt(std::vector<CryptoPP::byte> & input, 
-             std::vector<CryptoPP::byte> & result, 
+void Encrypt(std::vector<CryptoPP::byte> & input,
+             std::vector<CryptoPP::byte> & result,
              CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption E,
              CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
-    
+
     int n = input.size() / CryptoPP::AES::BLOCKSIZE;
     if (input.size() % CryptoPP::AES::BLOCKSIZE) n ++;
     n *= CryptoPP::AES::BLOCKSIZE;
 
     result.resize(n);
     CryptoPP::ArraySink cs(&result[0], result.size());
-    
+
     CryptoPP::ArraySource(input.data(), input.size(), true,
         new CryptoPP::StreamTransformationFilter(E,
             new CryptoPP::Redirector(cs),
@@ -47,44 +47,44 @@ void Encrypt(std::vector<CryptoPP::byte> & input,
 }
 
 // dec/ECB
-void Decrypt(std::vector<CryptoPP::byte> & input, 
-             std::vector<CryptoPP::byte> & result, 
+void Decrypt(std::vector<CryptoPP::byte> & input,
+             std::vector<CryptoPP::byte> & result,
              CryptoPP::ECB_Mode<CryptoPP::AES>::Decryption D,
              CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
-    
+
     result.resize(input.size());
     CryptoPP::ArraySink cs(&result[0], result.size());
-    
+
     CryptoPP::ArraySource(input.data(), input.size(), true,
         new CryptoPP::StreamTransformationFilter(D,
             new CryptoPP::Redirector(cs),
             paddingMethod
         )
     );
-	result.resize(cs.TotalPutLength());
+    result.resize(cs.TotalPutLength());
 }
 
 // dec/CBC
-void Decrypt(std::vector<CryptoPP::byte> & input, 
-             std::vector<CryptoPP::byte> & result, 
+void Decrypt(std::vector<CryptoPP::byte> & input,
+             std::vector<CryptoPP::byte> & result,
              CryptoPP::CBC_Mode<CryptoPP::AES>::Decryption D,
              CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod) {
-    
+
     result.resize(input.size());
     CryptoPP::ArraySink cs(&result[0], result.size());
-    
+
     CryptoPP::ArraySource(input.data(), input.size(), true,
         new CryptoPP::StreamTransformationFilter(D,
             new CryptoPP::Redirector(cs),
             paddingMethod
         )
     );
-	result.resize(cs.TotalPutLength());
+    result.resize(cs.TotalPutLength());
 }
 
 void Print(std::vector<CryptoPP::byte> & result) {
     for (int i = 0; i < result.size(); i ++)
-        // if ((int)result[i] > 16) 
+        // if ((int)result[i] > 16)
             std::cout << result[i];
     std::cout << std::endl;
 }
@@ -114,13 +114,13 @@ int main() {
     std::string _input  = "C9A03BCE0555B5FB2EC1D30A154FAE7C0AD045EA3C5738C788CED8007A5F124387A9144E595E3CEBD1382AF0DCC536B2";
     std::string _key    = "1234567890123456";
     std::string _iv     = "0000000000000000";
-    
+
     // Other Variables
     std::string encoded;
     int key_length = CryptoPP::AES::BLOCKSIZE;
-    CryptoPP::byte key[key_length] = {'1', '2', '3', '4', '5', '6', '7', '8', 
+    CryptoPP::byte key[key_length] = {'1', '2', '3', '4', '5', '6', '7', '8',
                                       '9', '0', '1', '2', '3', '4', '5', '6'};
-    CryptoPP::byte iv[CryptoPP::AES::BLOCKSIZE]  = {'0', '0', '0', '0', '0', '0', '0', '0', 
+    CryptoPP::byte iv[CryptoPP::AES::BLOCKSIZE]  = {'0', '0', '0', '0', '0', '0', '0', '0',
                                                     '0', '0', '0', '0', '0', '0', '0', '0'};
     std::vector<CryptoPP::byte> input, result;
     input.resize(_input.size());
@@ -138,16 +138,16 @@ int main() {
 
     // Set Key and IV
     for (int i = 0; i < key_length; i ++) key[i] = _key[i];
-    for (int i = 0; i < CryptoPP::AES::BLOCKSIZE; i ++) iv[i] = _iv[i];    
-    for (int i = 0; i < _input.size(); i ++) input[i] = _input[i];    
+    for (int i = 0; i < CryptoPP::AES::BLOCKSIZE; i ++) iv[i] = _iv[i];
+    for (int i = 0; i < _input.size(); i ++) input[i] = _input[i];
 
     // Set Padding
     CryptoPP::BlockPaddingSchemeDef::BlockPaddingScheme paddingMethod;
-    if (padding == "zeros") 
+    if (padding == "zeros")
         paddingMethod = CryptoPP::BlockPaddingSchemeDef::ZEROS_PADDING;
-    if (padding == "pkcs")  
+    if (padding == "pkcs")
         paddingMethod = CryptoPP::BlockPaddingSchemeDef::PKCS_PADDING;
-    
+
     // Set Mode and Encrypt
     if (state == "enc" && mode == "ECB") {
         CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption ECB;
